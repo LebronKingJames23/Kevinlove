@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.crm.mapper.CustomerMapper">
+    <select id="findCustomerLevelByDic"  resultType="Dict">
+        SELECT d.lid ,d.lname  from t_dict d
+    </select>
+    <insert id="addCustomer" parameterType="Customer">
+        insert into t_customer (<if test="custName!=null and custName!=''">
+        custName
+    </if>
+        <if test="custSource!=null and custSource!=''">
+            ,custSource
+        </if>
+        <if test="custlevel!=null and custlevel!=''">
+            ,custlevel
+        </if>
+        <if test="custPhone!=null and custPhone!=''">
+            ,custPhone
+        </if>
+        <if test="custMobile!=null and custMobile!=''">
+            ,custMobile
+        </if>
+        <if test="custAddress!=null and custAddress!=''">
+            ,custAddress
+        </if>
+        <if test="custZip!=null and custZip!=''">
+            ,custZip
+        </if>) values(<if test="custName!=null and custName!=''">
+        '${custName}'
+    </if>
+        <if test="custSource!=null and custSource!=''">
+            ,'${custSource}'
+        </if>
+        <if test="custlevel!=null and custlevel!=''">
+            ,'${custlevel}'
+        </if>
+        <if test="custPhone!=null and custPhone!=''">
+            ,'${custPhone}'
+        </if>
+        <if test="custMobile!=null and custMobile!=''">
+            ,'${custMobile}'
+        </if>
+        <if test="custAddress!=null and custAddress!=''">
+            ,'${custAddress}'
+        </if>
+        <if test="custZip!=null and custZip!=''">
+            ,'${custZip}'
+        </if>)
+    </insert>
+    <select id="findTotalCount"  resultType="int">
+        SELECT count(*) from t_customer;
+    </select>
+    <select id="findTotalCountByConditions" parameterType="Customer" resultType="int">
+        SELECT count(*) from t_customer where custName like '%${custName}%';
+    </select>
+    <resultMap id="queryCustomer" type="cn.crm.pojo.Customer">
+        <result column="cid" property="cid"/>
+        <result column="custName" property="custName"/>
+        <result column="custSource" property="custSource"/>
+        <result column="custPhone" property="custPhone"/>
+        <result column="custlevel" property="custlevel"/>
+        <result column="custMobile" property="custMobile"/>
+        <result column="custAddress" property="custAddress"/>
+        <result column="custZip" property="custZip"/>
+        <collection property="dict"  ofType="cn.crm.pojo.Dict">
+            <result column="lid" property="lid"></result>
+            <result column="lname" property="lname"/>
+        </collection>
+
+    </resultMap>
+    <select id="listCustomer"  resultMap="queryCustomer">
+        select t.cid,t.custName,t.custSource,t.custPhone,t.custMobile,d.lname from t_customer t,t_dict d where t.custlevel=d.lid
+        <if test="custName!=null">
+            and custName like '%${custName}%'
+        </if>
+         limit #{startRows},#{pageSize}
+    </select>
+    <select id="findCustomerById" parameterType="java.lang.Integer" resultMap="queryCustomer">
+        select t.cid,t.custName,t.custlevel,t.custSource,t.custPhone,t.custMobile,t.custAddress,t.custZip,d.lid,d.lname FROM t_customer t,t_dict d where t.custlevel=d.lid and t.cid=#{id}
+    </select>
+    <update id="editCustomer" parameterType="Customer">
+        update t_customer t set t.custName=#{custName},t.custSource=#{custSource},t.custPhone=#{custPhone},t.custMobile=#{custMobile},t.custAddress=#{custAddress},t.custZip=#{custZip} where t.cid=#{cid}
+    </update>
+    <delete id="deleteCustomer" parameterType="java.lang.Integer">
+        delete from t_customer where cid=#{id}
+    </delete>
+    <select id="listCustomerWithoutConditions"  resultMap="queryCustomer">
+        select t.cid,t.custName,t.custSource,t.custPhone,t.custMobile,d.lname from t_customer t,t_dict d where t.custlevel=d.lid
+        limit #{startRows},#{pageSize}
+    </select>
+    <select id="findAllCustomer" resultType="Customer">
+        select t.cid,t.custName from t_customer t
+    </select>
+    <resultMap id="source" type="java.util.Map">
+        <result column="custSource" property="custSource" jdbcType="VARCHAR"/>
+        <result column="num" property="num" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="custsourceSta" resultMap="source">
+      select count(1)as num,custSource from t_customer GROUP BY custSource
+    </select>
+    <resultMap id="level" type="java.util.Map">
+        <result column="lname" property="lname" jdbcType="VARCHAR"/>
+        <result column="num" property="num" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="custlevelSta" resultMap="level">
+        select d.lname as lname,count(*) as num from t_customer t,t_dict d where t.custlevel=d.lid group by custlevel
+    </select>
+</mapper>

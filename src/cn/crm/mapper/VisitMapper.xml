@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.crm.mapper.VisitMapper">
+    <resultMap id="vis" type="cn.crm.pojo.Visit">
+        <result column="visitaddress" property="visitaddress"/>
+        <result column="visitcontent" property="visitcontent"/>
+        <result column="visitid" property="visitid"/>
+        <collection property="user" ofType="cn.crm.pojo.User">
+            <result column="username" property="username"/>
+            <result column="userid" property="uid"/>
+        </collection>
+        <collection property="customer" ofType="cn.crm.pojo.Customer">
+            <result column="custName" property="custName"/>
+            <result column="idofcust" property="cid"/>
+        </collection>
+    </resultMap>
+ <!--   <select id="findCount" resultType="int">
+        select count(1) from t_customer t, user u,t_visit v where t.cid=v.idofcust and v.userid=u.uid
+    </select>-->
+    <select id="findCountByConditions" resultType="int">
+        select count(1) from t_customer t, user u,t_visit v where t.cid=v.idofcust and v.userid=u.uid and v.userid='${user.uid}' and v.idofcust='${customer.cid}'
+        <if test="visitaddress!=null and visitaddress!=''">
+            and v.visitaddress='${visitaddress}'
+        </if>
+    </select>
+    <select id="findAllvisit" resultMap="vis">
+         select u.username,t.custName,v.visitaddress,v.visitcontent,v.visitid from t_customer t, user u,t_visit v where t.cid=v.idofcust and v.userid=u.uid
+         limit #{startRows},#{pageSize}
+     </select>
+    <select id="findvisitByConditions" resultMap="vis">
+        select u.username,t.custName,v.visitaddress,v.visitcontent,v.visitid from t_customer t, user u,t_visit v where t.cid=v.idofcust and v.userid=u.uid
+        and v.userid=#{visit.user.uid} and v.idofcust=#{visit.customer.cid}
+        <if test="visit.visitaddress!=null and visit.visitaddress!=''">
+            and v.visitaddress=#{visit.visitaddress}
+        </if>
+        limit #{startRows},#{pageSize}
+    </select>
+    <insert id="addvisit" parameterType="Visit">
+        insert into t_visit(userid,idofcust<if test="visitaddress!=null and visitaddress!=''">,visitaddress</if>
+        <if test="visitcontent!=null and visitcontent!=''">,visitcontent</if>) values(#{user.uid},#{customer.cid}
+        <if test="visitaddress!=null and visitaddress!=''">,'${visitaddress}'</if>
+        <if test="visitcontent!=null and visitcontent!=''">,'${visitcontent}'</if>
+        )
+    </insert>
+</mapper>

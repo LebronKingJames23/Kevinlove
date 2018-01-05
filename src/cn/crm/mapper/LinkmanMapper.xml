@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.crm.mapper.LinkmanMapper">
+    <resultMap id="lkm" type="cn.crm.pojo.LinkMan">
+        <result column="linkid" property="linkid"/>
+        <result column="lkmName" property="lkmName"/>
+        <result column="lkmGender" property="lkmGender"/>
+        <result column="lkmPhone" property="lkmPhone"/>
+        <result column="lkmMobile" property="lkmMobile"/>
+        <collection property="customer" ofType="cn.crm.pojo.Customer">
+        <result column="custName" property="custName"></result>
+            <result column="cid" property="cid"></result>
+        </collection>
+    </resultMap>
+    <select id="findTotalCount" resultType="int">
+      select count(1) from t_linkman
+    </select>
+    <select id="findCountByConditions" parameterType="LinkMan" resultType="int">
+        select count(1) from t_linkman where lkmName like '%${lkmName}%'
+            <if test="customer.cid!=null and customer.cid!=''">
+                and clid='${customer.cid}'
+            </if>
+    </select>
+   <!-- <select id="listLinkman" resultMap="lkm">
+        select t.linkid ,t.lkmName,t.lkmGender,t.lkmPhone,t.lkmMobile from t_linkman t limit #{startRows},#{pageSize}
+    </select>-->
+    <select id="queryByConditions" resultMap="lkm">
+        select t.linkid ,t.lkmName,t.lkmGender,t.lkmPhone,t.lkmMobile from t_linkman t
+        where t.lkmName like '%${linkman.lkmName}%'
+        <if test="linkman.customer.cid!=null and linkman.customer.cid!=''">
+            and t.clid=#{linkman.customer.cid}
+        </if>
+        limit #{startRows},#{pageSize}
+    </select>
+    <select id="findLinkmanById" parameterType="LinkMan" resultMap="lkm">
+        select d.linkid,d.lkmName,d.lkmGender,d.lkmPhone,d.lkmMobile,t.custName,t.cid from t_customer t,t_linkman d where t.cid=d.clid
+        and d.linkid='${linkid}'
+    </select>
+    <update id="updateLinkman" parameterType="LinkMan">
+        update t_linkman set clid=#{customer.cid}, lkmName=#{lkmName},lkmGender=#{lkmGender},lkmPhone=#{lkmPhone},lkmMobile=#{lkmMobile}
+        where linkid=#{linkid}
+    </update>
+    <insert id="addLinkman" parameterType="LinkMan">
+        insert into t_linkman(clid,
+        <if test="lkmName!=null and lkmName!=''">
+            lkmName
+        </if>
+        <if test="lkmGender!=null and lkmGender!=''">
+            ,lkmGender
+        </if>
+        <if test="lkmMobile!=null and lkmMobile!=''">
+            ,lkmMobile
+        </if>
+        <if test="lkmPhone!=null and lkmPhone!=''">
+            ,lkmPhone
+        </if>
+        )value(#{customer.cid}
+        <if test="lkmName!=null and lkmName!=''">
+            ,'${lkmName}'
+        </if>
+        <if test="lkmGender!=null and lkmGender!=''">
+            ,'${lkmGender}'
+        </if>
+        <if test="lkmMobile!=null and lkmMobile!=''">
+            ,'${lkmMobile}'
+        </if>
+        <if test="lkmPhone!=null and lkmPhone!=''">
+            ,'${lkmPhone}'
+        </if>
+        )
+    </insert>
+    <delete id="deleteLinkman" parameterType="LinkMan">
+        delete from t_linkman where linkid=#{linkid}
+    </delete>
+    <select id="findLinkmanByCustomerId" parameterType="int" resultMap="lkm">
+        select t.cid,d.* from t_customer t,t_linkman d where t.cid=d.clid and t.cid=#{id}
+    </select>
+    <update id="setCustomerNUll" parameterType="java.util.List">
+        update t_linkman set clid = NULL where linkid IN
+        <foreach collection="list" item="LinkMan" index="index" open="(" separator="," close=")" >
+            #{LinkMan.linkid}
+        </foreach>
+    </update>
+</mapper>

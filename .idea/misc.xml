@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectResources">
+    <resource url="http://www.w3c.org/TR/1999/REC-html401-19991224/frameset.dtd" location="$PROJECT_DIR$/../../org.eclipse.wst.standard.schemas_1.0.700.v201304171715.jar!/dtds/frameset.dtd" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

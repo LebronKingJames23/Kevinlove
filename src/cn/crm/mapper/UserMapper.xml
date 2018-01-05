@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.crm.mapper.UserMapper">
+    <insert id="registUser" parameterType="User">
+        INSERT INTO USER (<if test="username!=null and username!=''">
+        username
+    </if>
+        <if test="password!=null and password!=''">
+            ,password
+        </if><if test="address!=null and address!=''">
+        ,address
+    </if>) VALUES (<if test="username!=null and username!=''">
+      '${username}'
+    </if>
+        <if test="password!=null and password!=''">
+        ,'${password}'
+        </if>
+        <if test="address!=null and address!=''">
+            ,'${address}'
+        </if>)
+    </insert>
+    <select id="login" parameterType="User" resultType="User">
+        select u.username FROM USER u WHERE u.username='${username}' and u.password='${password}'
+    </select>
+    <select id="findAllUsers" resultType="User">
+        select t.uid,t.username from user t
+    </select>
+   <!-- <select id="loginByProcedure" parameterType="User" statementType="CALLABLE">
+         <![CDATA[
+        call userlogin(
+        #{username,mode=INOUT,jdbcType=VARCHAR},
+        #{password,mode=IN,jdbcType=VARCHAR}
+        ]]>
+    </select>-->
+</mapper>

@@ -27,11 +27,11 @@
     <select id="findAllUsers" resultType="User">
         select t.uid,t.username from user t
     </select>
-   <!-- <select id="loginByProcedure" parameterType="User" statementType="CALLABLE">
+    <select id="loginByProcedure" parameterType="User" statementType="CALLABLE" resultType="User">
          <![CDATA[
-        call userlogin(
-        #{username,mode=INOUT,jdbcType=VARCHAR},
-        #{password,mode=IN,jdbcType=VARCHAR}
+        call selectUser(
+        #{username,mode=IN,jdbcType=VARCHAR},
+        #{password,mode=IN,jdbcType=VARCHAR})
         ]]>
-    </select>-->
+    </select>
 </mapper>

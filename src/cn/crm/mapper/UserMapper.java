@@ -11,5 +11,5 @@ public interface UserMapper {
 
     List<User> findAllUsers();
 
-    //User loginByProcedure(User user);
+    User loginByProcedure(User user);
 }

@@ -11,5 +11,5 @@ public interface UserService {
 
     List<User> findAllUsers();
 
-   // User loginByProcedure(User user);
+   User loginByProcedure(User user);
 }

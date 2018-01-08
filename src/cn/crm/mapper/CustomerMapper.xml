@@ -70,18 +70,48 @@
         </collection>
 
     </resultMap>
-    <select id="listCustomer"  resultMap="queryCustomer">
+   <!-- <select id="listCustomer"  resultMap="queryCustomer">
         select t.cid,t.custName,t.custSource,t.custPhone,t.custMobile,d.lname from t_customer t,t_dict d where t.custlevel=d.lid
         <if test="custName!=null">
             and custName like '%${custName}%'
         </if>
          limit #{startRows},#{pageSize}
+    </select>-->
+    <select id="listCustomer" resultMap="queryCustomer">
+         <![CDATA[
+        call queryCustomerByConditions(
+        #{custName,mode=IN,jdbcType=VARCHAR},
+        #{startRows,mode=IN,jdbcType=INTEGER},
+        #{pageSize,mode=IN,jdbcType=INTEGER}
+        )
+        ]]>
     </select>
-    <select id="findCustomerById" parameterType="java.lang.Integer" resultMap="queryCustomer">
+    <!--sql查询>
+  <select id="findCustomerById" parameterType="java.lang.Integer" resultMap="queryCustomer">
         select t.cid,t.custName,t.custlevel,t.custSource,t.custPhone,t.custMobile,t.custAddress,t.custZip,d.lid,d.lname FROM t_customer t,t_dict d where t.custlevel=d.lid and t.cid=#{id}
+    </select>-->
+    <!--调用存储过程-->
+    <select id="findCustomerById" parameterType="java.lang.Integer"
+            statementType="CALLABLE" resultMap="queryCustomer">
+           <![CDATA[
+        call findbyid(
+        #{id,mode=IN,jdbcType=VARCHAR})
+        ]]>
     </select>
-    <update id="editCustomer" parameterType="Customer">
+   <!-- <update id="editCustomer" parameterType="Customer">
         update t_customer t set t.custName=#{custName},t.custSource=#{custSource},t.custPhone=#{custPhone},t.custMobile=#{custMobile},t.custAddress=#{custAddress},t.custZip=#{custZip} where t.cid=#{cid}
+    </update>-->
+    <update id="editCustomer" parameterType="Customer" statementType="CALLABLE">
+            <![CDATA[
+        call updateCustomer(
+        #{custName,mode=IN,jdbcType=VARCHAR},
+        #{custSource,mode=IN,jdbcType=VARCHAR},
+        #{custPhone,mode=IN,jdbcType=VARCHAR},
+        #{custMobile,mode=IN,jdbcType=VARCHAR},
+        #{custAddress,mode=IN,jdbcType=VARCHAR},
+        #{custZip,mode=IN,jdbcType=VARCHAR},
+        #{cid,mode=IN,jdbcType=INTEGER})
+        ]]>
     </update>
     <delete id="deleteCustomer" parameterType="java.lang.Integer">
         delete from t_customer where cid=#{id}

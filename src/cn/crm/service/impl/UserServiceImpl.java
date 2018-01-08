@@ -30,8 +30,8 @@ public class UserServiceImpl implements UserService {
         return userMapper.findAllUsers();
     }
 
-    /*@Override
+    @Override
     public User loginByProcedure(User user) {
         return userMapper.loginByProcedure(user);
-    }*/
+    }
 }

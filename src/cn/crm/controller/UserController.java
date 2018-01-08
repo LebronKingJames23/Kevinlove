@@ -25,8 +25,8 @@ public class UserController {
     @RequestMapping("login")
     public String login(User User, HttpServletRequest request, HttpServletResponse response) {
         User.setPassword(MD5Utils.md5(User.getPassword()));
-        User user = UserService.login(User);
-       // User user=UserService.loginByProcedure(User);
+        //User user = UserService.login(User);
+       User user=UserService.loginByProcedure(User);
         if (user == null) {
             try {
                 return "login";

@@ -19,9 +19,11 @@
     </select>
     <select id="findCountByConditions" parameterType="LinkMan" resultType="int">
         select count(1) from t_linkman where lkmName like '%${lkmName}%'
+        <if test="customer!=null">
             <if test="customer.cid!=null and customer.cid!=''">
                 and clid='${customer.cid}'
             </if>
+        </if>
     </select>
    <!-- <select id="listLinkman" resultMap="lkm">
         select t.linkid ,t.lkmName,t.lkmGender,t.lkmPhone,t.lkmMobile from t_linkman t limit #{startRows},#{pageSize}
@@ -29,11 +31,14 @@
     <select id="queryByConditions" resultMap="lkm">
         select t.linkid ,t.lkmName,t.lkmGender,t.lkmPhone,t.lkmMobile from t_linkman t
         where t.lkmName like '%${linkman.lkmName}%'
+        <if test="linkman.customer!=null">
         <if test="linkman.customer.cid!=null and linkman.customer.cid!=''">
             and t.clid=#{linkman.customer.cid}
         </if>
+        </if>
         limit #{startRows},#{pageSize}
     </select>
+
     <select id="findLinkmanById" parameterType="LinkMan" resultMap="lkm">
         select d.linkid,d.lkmName,d.lkmGender,d.lkmPhone,d.lkmMobile,t.custName,t.cid from t_customer t,t_linkman d where t.cid=d.clid
         and d.linkid='${linkid}'
@@ -42,37 +47,54 @@
         update t_linkman set clid=#{customer.cid}, lkmName=#{lkmName},lkmGender=#{lkmGender},lkmPhone=#{lkmPhone},lkmMobile=#{lkmMobile}
         where linkid=#{linkid}
     </update>
-    <insert id="addLinkman" parameterType="LinkMan">
-        insert into t_linkman(clid,
-        <if test="lkmName!=null and lkmName!=''">
-            lkmName
-        </if>
-        <if test="lkmGender!=null and lkmGender!=''">
-            ,lkmGender
-        </if>
-        <if test="lkmMobile!=null and lkmMobile!=''">
-            ,lkmMobile
-        </if>
-        <if test="lkmPhone!=null and lkmPhone!=''">
-            ,lkmPhone
-        </if>
-        )value(#{customer.cid}
-        <if test="lkmName!=null and lkmName!=''">
-            ,'${lkmName}'
-        </if>
-        <if test="lkmGender!=null and lkmGender!=''">
-            ,'${lkmGender}'
-        </if>
-        <if test="lkmMobile!=null and lkmMobile!=''">
-            ,'${lkmMobile}'
-        </if>
-        <if test="lkmPhone!=null and lkmPhone!=''">
-            ,'${lkmPhone}'
-        </if>
+    <insert id="addLinkman" parameterType="LinkMan" statementType="CALLABLE">
+           <![CDATA[
+        call addLinkman(
+        #{customer.cid,mode=IN,jdbcType=VARCHAR},
+        #{lkmName,mode=IN,jdbcType=VARCHAR},
+        #{lkmGender,mode=IN,jdbcType=VARCHAR},
+        #{lkmMobile,mode=IN,jdbcType=VARCHAR},
+        #{lkmPhone,mode=IN,jdbcType=VARCHAR}
         )
+        ]]>
     </insert>
-    <delete id="deleteLinkman" parameterType="LinkMan">
+    <!--<insert id="addLinkman" parameterType="LinkMan">
+            insert into t_linkman(clid,
+            <if test="lkmName!=null and lkmName!=''">
+                lkmName
+            </if>
+            <if test="lkmGender!=null and lkmGender!=''">
+                ,lkmGender
+            </if>
+            <if test="lkmMobile!=null and lkmMobile!=''">
+                ,lkmMobile
+            </if>
+            <if test="lkmPhone!=null and lkmPhone!=''">
+                ,lkmPhone
+            </if>
+            )value(#{customer.cid}
+            <if test="lkmName!=null and lkmName!=''">
+                ,'${lkmName}'
+            </if>
+            <if test="lkmGender!=null and lkmGender!=''">
+                ,'${lkmGender}'
+            </if>
+            <if test="lkmMobile!=null and lkmMobile!=''">
+                ,'${lkmMobile}'
+            </if>
+            <if test="lkmPhone!=null and lkmPhone!=''">
+                ,'${lkmPhone}'
+            </if>
+            )
+        </insert>-->
+    <!--<delete id="deleteLinkman" parameterType="LinkMan">
         delete from t_linkman where linkid=#{linkid}
+    </delete>-->
+    <delete id="deleteLinkman" parameterType="LinkMan" statementType="CALLABLE">
+        <![CDATA[
+        call deleteLinkman(
+           #{linkid,mode=IN,jdbcType=INTEGER}
+        )]]>
     </delete>
     <select id="findLinkmanByCustomerId" parameterType="int" resultMap="lkm">
         select t.cid,d.* from t_customer t,t_linkman d where t.cid=d.clid and t.cid=#{id}
